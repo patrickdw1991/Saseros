@@ -1,5 +1,4 @@
-#pragma config(Sensor, S3,     lightSensor,         sensorLightActive)
-
+#pragma config(Sensor, S1,     touchSensor,         sensorTouch)
 task main()
 {
 	eraseDisplay();
