@@ -66,7 +66,7 @@ void backAndTurn(void){
 
 void sonarTriggered(void)
 {
-	stop(motorA);
+	_stop(motorA);
 	wait1Msec(2000);
 	if (SensorValue(sonarSensor)<25) {
 		BackAndTurn();
