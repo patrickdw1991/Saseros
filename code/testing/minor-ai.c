@@ -7,10 +7,15 @@ void forward(int speed, int masterMotor){
 	motor[masterMotor] = speed;
 }
 
-void backward(int speed, int masterMotor){
+void backwards(int speed, int masterMotor){
 	nSyncedTurnRatio = 100;
 	motor[masterMotor] = -speed;
 }
+
+void _stop(int masterMotor){
+	motor[masterMotor] = 0;
+}
+
 
 void turn_left(int speed, int masterMotor, int ms)
 {
@@ -20,12 +25,8 @@ void turn_left(int speed, int masterMotor, int ms)
 	nSyncedTurnRatio = 100;
 }
 
-void stop(int masterMotor){
-	motor[masterMotor] = 0;
-}
-
 void safeState(const string sensor){
-	stop(motorA);
+	_stop(motorA);
 	while(nNxtButtonPressed == -1){
 		eraseDisplay();
 		nxtDisplayString(1, "%s", sensor);
@@ -35,52 +36,34 @@ void safeState(const string sensor){
 	forward(100,motorA);
 }
 
-void failState(const string fail){
-	stop(motorA);
-	while(nNxtButtonPressed == -1){
-		eraseDisplay();
-		nxtDisplayString(1, "%s", fail);
-		wait1Msec(50);
-	}
-}
-
 void batLow(void){
-	stop(motorA);
+	_stop(motorA);
 	eraseDisplay();
 	nxtDisplayString(1, "%s", "Battery low!");
 }
 
-void backBumper(void){
-	stop(motorA);
+void backBumperTriggered(void){
+	_stop(motorA);
 	eraseDisplay();
 	nxtDisplayString(1, "%s", "Back bumper!");
+
 	wait1Msec(2000);
 }
 
-void frontBumper(void){
-	stop(motorA);
-	eraseDisplay();
-	nxtDisplayString(1, "%s", "Back bumper!");
+void backAndTurn(void){
+	_stop(motorA);
 	nMotorEncoder[motorA] = 0;
 	nMotorEncoderTarget[motorA] = 720;
-	backward(40,motorA);
-	while(nMotorRunState[motorB] != runStateIdle){
-		if(SensorValue(bumpBack)) failState("I think i'm stuck");
+	backwards(50,motorA);
+	while(nMotorRunState[motorA] != runStateIdle){
+		if(SensorValue(bumpBack)) StopAllTasks();
 	}
+	_stop(motorA);
 	wait1Msec(1000);
-	turn_left(50,motorA,(random(180)+60));
+	turn_left(50,motorA,(random(500)+500));
+	forward(100,motorA);
 }
 
-void sonarTriggered(void)
-{
-	stop(motorA);
-	wait1Msec(2000);
-	if (SensorValue(sonarSensor)<25) {
-		BackAndTurn();
-	} else {
-		forward(75, motorA);
-	}
-}
 
 task main()
 {
@@ -93,9 +76,12 @@ task main()
 		nxtDisplayString(2, "%d", SensorValue(bumpBack));
   	wait1Msec(50);
   	eraseDisplay();
-  	if(SensorValue(bumpFront))frontBumper();
+  	if(SensorValue(bumpFront))backAndTurn();
   	if(SensorValue(bumpBack))safeState("Back Bumper");
+<<<<<<< HEAD
   	if(SensorValue(sonarSensor)<25)sonarTriggered();
  // 	if(nAvgBatteryLevel < 6100)batLow();
+=======
+>>>>>>> b962554dec7e7ecdd62b7c58ecddf8fc42fd2688
 	}
 }
