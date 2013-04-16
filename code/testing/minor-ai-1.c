@@ -1,9 +1,12 @@
 #pragma config(Sensor, S1,     bumpFront,         sensorTouch)
 #pragma config(Sensor, S2,     bumpBack,          sensorTouch)
+#pragma config(Sensor, S3,		 lightSensor,				sensorLightActive)
 #pragma config(Sensor, S4,		 sonarSensor,       sensorSONAR)
 
 #define DEF_SPEED 75
 #define SONAR_DISTANCE 50
+#define DARK_LIMIT 35
+#define LOW_BATTERY 6000
 
 void forward(int speed, int masterMotor){
 	nSyncedTurnRatio = 100;
@@ -57,12 +60,12 @@ void backBumperTriggered(void){
 	else forward(DEF_SPEED,motorA);
 }
 
-void backAndTurn(void){
+void backAndTurn(int distanceToBackUp){
 	_stop(motorA);
 	bool failed = false;
 	nMotorEncoder[motorA] = 0;
-	nMotorEncoderTarget[motorA] = 720;
-	backwards(DEF_SPEED,motorA);
+	nMotorEncoderTarget[motorA] = distanceToBackUp*180;
+	backwards(DEF_SPEED, motorA);
 	while(nMotorRunState[motorA] != runStateIdle){
 		if(SensorValue(bumpBack)){
 			failed = true;
@@ -85,35 +88,56 @@ void sonarTriggered (void) {
 	_stop(motorA);
 	wait1Msec(2000);
 	if(SensorValue(sonarSensor)<SONAR_DISTANCE) {
-		backAndTurn();
+		backAndTurn(1);
 	} else {
 		forward(DEF_SPEED, motorA);
 	}
 }
 
+void lightSensorTriggered(void) {
+	PlaySound(soundBlip);
+	wait1Msec(1000);
+	backAndTurn(1);
+}
+
 void sensorCheck(void){
 	eraseDisplay();
-	nxtDisplayString(1, "%s", "Push FrontBumper");
+	nxtDisplayString(1, "Push the");
+	nxtDisplayString(2, "front bumper");
 	while(!SensorValue(bumpFront)){ wait1Msec(50); }
-	PlaySound(soundBlip);
+	PlaySound(soundBeepBeep);
 
 	eraseDisplay();
-	nxtDisplayString(1, "%s", "Push backBumper");
+	nxtDisplayString(1, "Push the");
+	nxtDisplayString(2, "back bumper");
 	while(!SensorValue(bumpBack))wait1Msec(50);
-	PlaySound(soundBlip);
+	PlaySound(soundBeepBeep);
 
 	eraseDisplay();
-	nxtDisplayString(1, "%s", "Place hand in");
-	nxtDisplayString(2, "%s", "front of sonar");
-	while(SensorValue(sonarSensor)>40)wait1Msec(50);
-	PlaySound(soundBlip);
+	nxtDisplayString(1, "Place hand in");
+	nxtDisplayString(2, "front of sonar");
+	while(SensorValue(sonarSensor)>SONAR_DISTANCE)wait1Msec(50);
+	PlaySound(soundBeepBeep);
+
+	eraseDisplay();
+	nxtDisplayString(1, "Light Sensor:");
+	if (SensorValue(lightSensor) > 0) {
+		nxtDisplayString(2, "OK");
+	} else {
+		failState("Lightsensor error");
+	}
+	wait1Msec(2500);
+
+	eraseDisplay();
+	nxtDisplayString(1, "Starting shortly...");
+	wait1Msec(5000);
 }
 
 
 task main()
 {
-	if(nAvgBatteryLevel < 7000)failState("Battery is low");
-
+	if (nAvgBatteryLevel < LOW_BATTERY) failState("Battery is low");
+	sensorCheck();
 	srand(nMotorEncoder[motorA]);
 	nSyncedMotors = synchAB;
 
@@ -125,12 +149,13 @@ task main()
 		nxtDisplayString(2, "%d", SensorValue(bumpBack));
   	wait1Msec(50);
 
-  	if(nAvgBatteryLevel < 7000)failState("Battery is low");
+  	if(nAvgBatteryLevel < LOW_BATTERY) failState("Battery is low");
   	if(SensorValue(bumpFront)){
   		PlaySound(soundLowBuzzShort);
-  		backAndTurn();
+  		backAndTurn(3);
   	}
-  	if(SensorValue(bumpBack))backBumperTriggered();
-  	if(SensorValue(sonarSensor)<SONAR_DISTANCE)sonarTriggered();
+  	if(SensorValue(bumpBack)) backBumperTriggered();
+  	if(SensorValue(sonarSensor)<SONAR_DISTANCE) sonarTriggered();
+  	if(SensorValue(lightSensor)<DARK_LIMIT) lightSensorTriggered();
 	}
 }
