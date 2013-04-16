@@ -29,12 +29,19 @@ void turn_left(int speed, int masterMotor, int ms)
 
 void failState(const string sensor){
 	_stop(motorA);
+	PlaySound(soundDownwardTones);
+	int sound_cnt = 0;
 	while(nNxtButtonPressed == -1){
 		eraseDisplay();
 		nxtDisplayString(1, "%s", sensor);
 		wait1Msec(50);
+		if(sound_cnt++ > 2000){
+			sound_cnt = 0;
+			PlaySound(soundDownwardTones);
+		}
 	}
 	wait1Msec(500);
+	eraseDisplay();
 	forward(DEF_SPEED,motorA);
 }
 
@@ -48,28 +55,34 @@ void backBumperTriggered(void){
 	_stop(motorA);
 	PlaySound(soundLowBuzz);
 	wait1Msec(2000);
-	if(SensorValue(bumpBack)) StopAllTasks();
+	if(SensorValue(bumpBack))failState("Backbumper triggered too long");
 	else forward(DEF_SPEED,motorA);
 }
 
 void backAndTurn(void){
 	_stop(motorA);
+	bool failed = false;
 	nMotorEncoder[motorA] = 0;
 	nMotorEncoderTarget[motorA] = 720;
 	backwards(DEF_SPEED,motorA);
 	while(nMotorRunState[motorA] != runStateIdle){
-		if(SensorValue(bumpBack)) StopAllTasks();
+		if(SensorValue(bumpBack))
+			failState("Backbumper during backwards");
+			failed = true;
+			break;
 	}
-	_stop(motorA);
-	wait1Msec(1000);
-	turn_left(50,motorA,(random(500)+500));
-	forward(DEF_SPEED,motorA);
+	if(!failed){
+		_stop(motorA);
+		wait1Msec(1000);
+		turn_left(50,motorA,(random(500)+500));
+		forward(DEF_SPEED,motorA);
+	}
 }
 
 void sonarTriggered(void)
 {
-	_stop(motorA);
 	PlaySound(soundBlip);
+	_stop(motorA);
 	wait1Msec(2000);
 	if(SensorValue(sonarSensor)<SONAR_DISTANCE) {
 		backAndTurn();
@@ -80,18 +93,24 @@ void sonarTriggered(void)
 
 task main()
 {
+	if(nAvgBatteryLevel < 7200)failState("Battery is low");
+
 	srand(nMotorEncoder[motorA]);
 	nSyncedMotors = synchAB;
-	eraseDisplay();
+
 	forward(DEF_SPEED,motorA);
+
 	while(nNxtButtonPressed == -1){
+		eraseDisplay();
 		nxtDisplayString(1, "%d", SensorValue(bumpFront));
 		nxtDisplayString(2, "%d", SensorValue(bumpBack));
   	wait1Msec(50);
-  	eraseDisplay();
+
+
+  	if(nAvgBatteryLevel < 7200)failState("Battery is low");
   	if(SensorValue(bumpFront)){
-  		backAndTurn();
   		PlaySound(soundBeepBeep);
+  		backAndTurn();
   	}
   	if(SensorValue(bumpBack))backBumperTriggered();
   	if(SensorValue(sonarSensor)<SONAR_DISTANCE)sonarTriggered();
