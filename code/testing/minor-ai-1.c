@@ -4,7 +4,7 @@
 #pragma config(Sensor, S4,		 sonarSensor,       sensorSONAR)
 
 #define DEF_SPEED 75
-#define SONAR_DISTANCE 50
+#define SONAR_DISTANCE 30
 #define DARK_LIMIT 35
 #define LOW_BATTERY 6000
 
@@ -88,7 +88,7 @@ void sonarTriggered (void) {
 	_stop(motorA);
 	wait1Msec(2000);
 	if(SensorValue(sonarSensor)<SONAR_DISTANCE) {
-		backAndTurn(1);
+		backAndTurn(2);
 	} else {
 		forward(DEF_SPEED, motorA);
 	}
@@ -96,8 +96,9 @@ void sonarTriggered (void) {
 
 void lightSensorTriggered(void) {
 	PlaySound(soundBlip);
+	_stop(motorA);
 	wait1Msec(1000);
-	backAndTurn(1);
+	backAndTurn(2);
 }
 
 void sensorCheck(void){
