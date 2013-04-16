@@ -67,7 +67,7 @@ void backAndTurn(int distanceToBackUp){
 	nMotorEncoderTarget[motorA] = distanceToBackUp*180;
 	backwards(DEF_SPEED, motorA);
 	while(nMotorRunState[motorA] != runStateIdle){
-		if(SensorValue(bumpBack)){
+		if(SensorValue(bumpBack) || SensorValue(lightSensor)<DARK_LIMIT){
 			failed = true;
 			break;
 		}
@@ -139,7 +139,7 @@ task main()
 {
 	if (nAvgBatteryLevel < LOW_BATTERY) failState("Battery is low");
 	sensorCheck();
-	srand(nMotorEncoder[motorA]);
+	//srand(nMotorEncoder[motorA]);
 	nSyncedMotors = synchAB;
 
 	forward(DEF_SPEED,motorA);
