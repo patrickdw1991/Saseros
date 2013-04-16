@@ -53,9 +53,9 @@ void batLow(void){
 
 void backBumperTriggered(void){
 	_stop(motorA);
-	PlaySound(soundLowBuzz);
+	PlaySound(soundLowBuzzShort);
 	wait1Msec(2000);
-	if(SensorValue(bumpBack))failState("Backbumper triggered too long");
+	if(SensorValue(bumpBack))failState("Backbumper");
 	else forward(DEF_SPEED,motorA);
 }
 
@@ -66,17 +66,20 @@ void backAndTurn(void){
 	nMotorEncoderTarget[motorA] = 720;
 	backwards(DEF_SPEED,motorA);
 	while(nMotorRunState[motorA] != runStateIdle){
-		if(SensorValue(bumpBack))
-			failState("Backbumper during backwards");
+		if(SensorValue(bumpBack)){
 			failed = true;
 			break;
+		}
 	}
-	if(!failed){
+	if(failed){
+		failState("Backbumper during backwards");
+		failed = false;
+	} else {
 		_stop(motorA);
 		wait1Msec(1000);
 		turn_left(50,motorA,(random(500)+500));
-		forward(DEF_SPEED,motorA);
 	}
+	forward(DEF_SPEED,motorA);
 }
 
 void sonarTriggered(void)
@@ -91,9 +94,13 @@ void sonarTriggered(void)
 	}
 }
 
+void sensorCheck(void){
+
+}
+
 task main()
 {
-	if(nAvgBatteryLevel < 7200)failState("Battery is low");
+	if(nAvgBatteryLevel < 7000)failState("Battery is low");
 
 	srand(nMotorEncoder[motorA]);
 	nSyncedMotors = synchAB;
@@ -106,10 +113,9 @@ task main()
 		nxtDisplayString(2, "%d", SensorValue(bumpBack));
   	wait1Msec(50);
 
-
-  	if(nAvgBatteryLevel < 7200)failState("Battery is low");
+  	if(nAvgBatteryLevel < 7000)failState("Battery is low");
   	if(SensorValue(bumpFront)){
-  		PlaySound(soundBeepBeep);
+  		PlaySound(soundLowBuzzShort);
   		backAndTurn();
   	}
   	if(SensorValue(bumpBack))backBumperTriggered();
