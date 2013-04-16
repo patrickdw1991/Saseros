@@ -1,3 +1,5 @@
+#pragma config(Sensor, S4, sonarSensor, sensorSONAR) // configurating the ultrasonic sensor
+
 void forward(int speed, int masterMotor)
 {
 	nSyncedTurnRatio = 100;
@@ -6,6 +8,7 @@ void forward(int speed, int masterMotor)
 
 void backward(int speed, int masterMotor)
 {
+	//TODO: sound
 	nSyncedTurnRatio = 100;
 	motor[masterMotor] = -speed;
 }
@@ -24,7 +27,7 @@ void turn_right(int speed, int masterMotor, int ms)
 	wait1Msec(ms);
 }
 
-void _stop(int masterMotor)
+void stop(int masterMotor)
 {
 	motor[masterMotor] = 0;
 }
@@ -32,5 +35,5 @@ void _stop(int masterMotor)
 task main()
 {
 	nSyncedMotors = synchAB;
-	turn_right(50, motorA, 1000);
+	nSyncedTurnRatio = 100;
 }
