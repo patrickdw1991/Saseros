@@ -19,9 +19,7 @@ void _stop(int masterMotor){
 	motor[masterMotor] = 0;
 }
 
-
-void turn_left(int speed, int masterMotor, int ms)
-{
+void turn_left(int speed, int masterMotor, int ms){
 	nSyncedTurnRatio = -100;
 	motor[masterMotor] = speed;
 	wait1Msec(ms);
@@ -82,8 +80,7 @@ void backAndTurn(void){
 	forward(DEF_SPEED,motorA);
 }
 
-void sonarTriggered(void)
-{
+void sonarTriggered (void) {
 	PlaySound(soundBlip);
 	_stop(motorA);
 	wait1Msec(2000);
