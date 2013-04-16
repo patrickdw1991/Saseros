@@ -1,0 +1,25 @@
+//BATTERY LEVEL TEST
+nxtDisplayTextLine(0, "Battery Levels");
+nxtDisplayTextLine(2, "Avg %3.1fV;Now %3.1f", nAvgBatteryLevel / (float) 1000, nImmediateBatteryLevel / (float) 1000);
+
+//BATTERY CHECK
+bool checkBattery(){
+  
+	while (true){
+		if(nImmediateBatteryLevel < minBatteryLevel){ 
+			//Battery to low to proceed
+			PlaySound(soundLowBuzz);
+			eraseDisplay();
+			nxtDisplayTextLine(0, "BatteryLevel failed");
+			nxtDisplayTextLine(1, "Have to be over %3.1fV", minBatteryLevel);
+			nxtDisplayTextLine(2, "Now it is %3.1f", nImmediateBatteryLevel / (float) 1000);
+			nxtDisplayTextLine(3, "AvgBatteryLevel %3.1fV", nAvgBatteryLevel / (float) 1000);
+			return false;
+		}
+		//Battery OK
+		eraseDisplay();
+		nxtDisplayTextLine(4, "BatteryLevel are OK");
+		nxtDisplayTextLine(5, "BatteryLevel %3.1f", nImmediateBatteryLevel / (float) 1000);
+		return true;
+	}
+}
