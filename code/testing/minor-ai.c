@@ -64,6 +64,16 @@ void backAndTurn(void){
 	forward(100,motorA);
 }
 
+void sonarTriggered(void)
+{
+	stop(motorA);
+	wait1Msec(2000);
+	if (SensorValue(sonarSensor)<25) {
+		BackAndTurn();
+	} else {
+		forward(75, motorA);
+	}
+}
 
 task main()
 {
@@ -78,10 +88,6 @@ task main()
   	eraseDisplay();
   	if(SensorValue(bumpFront))backAndTurn();
   	if(SensorValue(bumpBack))safeState("Back Bumper");
-<<<<<<< HEAD
   	if(SensorValue(sonarSensor)<25)sonarTriggered();
- // 	if(nAvgBatteryLevel < 6100)batLow();
-=======
->>>>>>> b962554dec7e7ecdd62b7c58ecddf8fc42fd2688
 	}
 }
