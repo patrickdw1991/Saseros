@@ -4,7 +4,7 @@ task main()
 {
 	eraseDisplay();
   while(1){
-  	nxtDisplayString(1, "%d", SensorValue(touchSensor));
+  	nxtDisplayString(1, "%d", SensorValue(lightSensor));
   	wait1Msec(50);
   	eraseDisplay();
 	}

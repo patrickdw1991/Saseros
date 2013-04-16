@@ -1,5 +1,6 @@
 #pragma config(Sensor, S1,     bumpFront,         sensorTouch)
-#pragma config(Sensor, S2,     bumpBack,         sensorTouch)
+#pragma config(Sensor, S2,     bumpBack,          sensorTouch)
+#pragma config(Sensor, S4,		 sonarSensor,       sensorSonar)
 
 void forward(int speed, int masterMotor){
 	nSyncedTurnRatio = 100;
@@ -21,6 +22,7 @@ void turn_left(int speed, int masterMotor, int ms)
 	nSyncedTurnRatio = -100;
 	motor[masterMotor] = speed;
 	wait1Msec(ms);
+	nSyncedTurnRatio = 100;
 }
 
 void safeState(const string sensor){
@@ -62,6 +64,17 @@ void backAndTurn(void){
 	forward(100,motorA);
 }
 
+void sonarTriggered(void)
+{
+	_stop(motorA);
+	wait1Msec(2000);
+	if (SensorValue(sonarSensor)<25) {
+		BackAndTurn();
+	} else {
+		forward(75, motorA);
+	}
+}
+
 task main()
 {
 	srand(nMotorEncoder[motorA]);
@@ -75,5 +88,7 @@ task main()
   	eraseDisplay();
   	if(SensorValue(bumpFront))backAndTurn();
   	if(SensorValue(bumpBack))backBumperTriggered();
+  	if(SensorValue(bumpBack))safeState("Back Bumper");
+  	if(SensorValue(sonarSensor)<25)sonarTriggered();
 	}
 }
