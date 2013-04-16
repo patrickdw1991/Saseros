@@ -95,8 +95,23 @@ void sonarTriggered(void)
 }
 
 void sensorCheck(void){
+	eraseDisplay();
+	nxtDisplayString(1, "%s", "Push FrontBumper");
+	while(!SensorValue(bumpFront)){ wait1Msec(50); }
+	PlaySound(soundBlip);
 
+	eraseDisplay();
+	nxtDisplayString(1, "%s", "Push backBumper");
+	while(!SensorValue(bumpBack))wait1Msec(50);
+	PlaySound(soundBlip);
+
+	eraseDisplay();
+	nxtDisplayString(1, "%s", "Place hand in");
+	nxtDisplayString(2, "%s", "front of sonar");
+	while(SensorValue(sonarSensor)>40)wait1Msec(50);
+	PlaySound(soundBlip);
 }
+
 
 task main()
 {
