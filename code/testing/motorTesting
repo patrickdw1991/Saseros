@@ -1,0 +1,29 @@
+int counter = 0;
+
+void motorCheck(void) {
+  
+	//Reset motorA and motorB
+	nMotorEncoder[motorA] = 0;
+	nMotorEncoder[motorB] = 0;
+	
+	//Set target for motorA and motorB
+	nMotorEncoderTarget[motorA] = 200;
+	nMotorEncoderTarget[motorB] = 200;
+	
+	//Set powerLevel of motorA and motorB
+	motor[motorA] = 50;
+	motor[motorB] = 50;
+
+	while(nMotorRunState[motorA] != runStateIdle && nMotorRunState[motorB] != runStateIdle){
+		counter++; //??
+		nxtDisplayTextLine(0, "Testing motorA and motorB");	
+	}
+	if(counter == X){ //Dunno how long, have to test.
+		//READY TO START
+		motor[motorA] = 0; 
+		motor[motorB] = 0;
+	}else{
+		//FAIL
+		PlaySound(soundBeepBeep);
+		nxtDisplayTextLine(1, "MotorA and motorB failed");
+}
