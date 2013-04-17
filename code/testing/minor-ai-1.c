@@ -29,7 +29,7 @@ void turn_left(int speed, int masterMotor, int ms){
 	wait1Msec(ms);
 }
 
-void failState(const string sensor){
+void failState(const string sensor, bool contDriving){
 	_stop(motorA);
 	PlaySound(soundDownwardTones);
 	int sound_cnt = 0;
@@ -37,14 +37,15 @@ void failState(const string sensor){
 		eraseDisplay();
 		nxtDisplayString(1, "%s", sensor);
 		wait1Msec(50);
-		if(sound_cnt++ > 2000){
+		if(sound_cnt++ > 500){
 			sound_cnt = 0;
 			PlaySound(soundDownwardTones);
 		}
 	}
 	wait1Msec(500);
 	eraseDisplay();
-	forward(DEF_SPEED,motorA);
+	if(contDriving)forward(DEF_SPEED,motorA);
+	ClearTimer(T1);
 }
 
 void batLow(void){
@@ -57,7 +58,7 @@ void backBumperTriggered(void){
 	_stop(motorA);
 	PlaySound(soundLowBuzzShort);
 	wait1Msec(2000);
-	if(SensorValue(bumpBack))failState("Backbumper");
+	if(SensorValue(bumpBack))failState("Backbumper",1);
 	else forward(DEF_SPEED,motorA);
 }
 
@@ -74,7 +75,7 @@ void backAndTurn(int distanceToBackUp){
 		}
 	}
 	if(failed){
-		failState("Backbumper during backwards");
+		failState("Backbumper during backwards",1);
 		failed = false;
 	} else {
 		_stop(motorA);
@@ -109,7 +110,12 @@ void sensorCheck(void){
 	ClearTimer(T1);
 	while(!SensorValue(bumpFront)){
 		wait1Msec(50);
-		if(time100[T1] > WAIT_TIME) failState("Frontbumper error");
+		if(time100[T1] > WAIT_TIME){
+			failState("Frontbumper error",0);
+			eraseDisplay();
+			nxtDisplayString(1, "Push the");
+			nxtDisplayString(2, "front bumper");
+		}
 	}
 	PlaySound(soundBeepBeep);
 
@@ -119,7 +125,12 @@ void sensorCheck(void){
 	ClearTimer(T1);
 	while(!SensorValue(bumpBack)){
 		wait1Msec(50);
-		if(time100[T1] > WAIT_TIME) failState("Backbumper error");
+		if(time100[T1] > WAIT_TIME){
+			failState("Backbumper error",0);
+			eraseDisplay();
+			nxtDisplayString(1, "Push the");
+			nxtDisplayString(2, "back bumper");
+		}
 	}
 	PlaySound(soundBeepBeep);
 
@@ -129,7 +140,12 @@ void sensorCheck(void){
 	ClearTimer(T1);
 	while(SensorValue(sonarSensor)>SONAR_DISTANCE){
 		wait1Msec(50);
-		if(time100[T1] > WAIT_TIME) failState("Sonar error");
+		if(time100[T1] > WAIT_TIME){
+			failState("Sonar error",0);
+			eraseDisplay();
+			nxtDisplayString(1, "Place hand in");
+			nxtDisplayString(2, "front of sonar");
+		}
 	}
 	PlaySound(soundBeepBeep);
 
@@ -138,7 +154,7 @@ void sensorCheck(void){
 	if (SensorValue(lightSensor) > 0) {
 		nxtDisplayString(2, "OK");
 	} else {
-		failState("Lightsensor error");
+		failState("Lightsensor error",0);
 	}
 	wait1Msec(2500);
 
@@ -150,7 +166,7 @@ void sensorCheck(void){
 
 task main()
 {
-	if (nAvgBatteryLevel < LOW_BATTERY) failState("Battery is low");
+	if (nAvgBatteryLevel < LOW_BATTERY) failState("Battery is low",1);
 	sensorCheck();
 	//srand(nMotorEncoder[motorA]);
 	nSyncedMotors = synchAB;
@@ -163,7 +179,7 @@ task main()
 		nxtDisplayString(2, "%d", SensorValue(bumpBack));
   	wait1Msec(50);
 
-  	if(nAvgBatteryLevel < LOW_BATTERY) failState("Battery is low");
+  	if(nAvgBatteryLevel < LOW_BATTERY) failState("Battery is low",1);
   	if(SensorValue(bumpFront)){
   		PlaySound(soundLowBuzzShort);
   		backAndTurn(3);
