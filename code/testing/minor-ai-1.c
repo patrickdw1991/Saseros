@@ -1,7 +1,7 @@
-#pragma config(Sensor, S1,     bumpFront,         sensorTouch)
-#pragma config(Sensor, S2,     bumpBack,          sensorTouch)
-#pragma config(Sensor, S3,		 lightSensor,				sensorLightActive)
-#pragma config(Sensor, S4,		 sonarSensor,       sensorSONAR)
+#pragma config(Sensor, S1,    bumpFront,     sensorTouch)
+#pragma config(Sensor, S2,    bumpBack,      sensorTouch)
+#pragma config(Sensor, S3,    lightSensor,   sensorLightActive)
+#pragma config(Sensor, S4,    sonarSensor,   sensorSONAR)
 
 #define DEF_SPEED 75
 #define SONAR_DISTANCE 30
@@ -168,7 +168,7 @@ task main()
 {
 	if (nAvgBatteryLevel < LOW_BATTERY) failState("Battery is low",1);
 	sensorCheck();
-	//srand(nMotorEncoder[motorA]);
+	srand(nSysTime);
 	nSyncedMotors = synchAB;
 
 	forward(DEF_SPEED,motorA);
