@@ -6,7 +6,7 @@
 #define DEF_SPEED 30
 #define SONAR_DISTANCE 30
 #define DARK_LIMIT 35
-#define LOW_BATTERY 6000
+#define LOW_BATTERY 6700
 #define WAIT_TIME 50
 
 void forward(int speed, int masterMotor){
@@ -180,10 +180,37 @@ void sensorCheck(void){
 	wait1Msec(3000);
 }
 
+void motorCheck(void) {
+	//Reset motorA and motorB
+	nMotorEncoder[motorA] = 0;
+	nMotorEncoder[motorB] = 0;
+
+	//Set target for motorA and motorB
+	nMotorEncoderTarget[motorA] = 10;
+	nMotorEncoderTarget[motorB] = 10;
+
+	eraseDisplay();
+	nxtDisplayTextLine(0, "Testing motor A");
+	wait1Msec(1000);
+	ClearTimer(T1);
+	motor[motorA] = DEF_SPEED;
+	while(nMotorRunState[motorA] != runStateIdle){
+		if(time100[T1] > 20) failState("Motor A failed",0);
+	}
+	eraseDisplay();
+	nxtDisplayTextLine(0, "Testing motor B");
+	ClearTimer(T1);
+	motor[motorB] = DEF_SPEED;
+	while(nMotorRunState[motorB] != runStateIdle){
+		if(time100[T1] > 20) failState("Motor B failed",0);
+	}
+}
+
 
 task main()
 {
 	if (nAvgBatteryLevel < LOW_BATTERY) failState("Battery is low",1);
+	motorCheck();
 	sensorCheck();
 	srand(nSysTime);
 	nSyncedMotors = synchAB;
