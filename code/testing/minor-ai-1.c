@@ -7,6 +7,7 @@
 #define SONAR_DISTANCE 30
 #define DARK_LIMIT 35
 #define LOW_BATTERY 6000
+#define WAIT_TIME 50
 
 void forward(int speed, int masterMotor){
 	nSyncedTurnRatio = 100;
@@ -105,19 +106,31 @@ void sensorCheck(void){
 	eraseDisplay();
 	nxtDisplayString(1, "Push the");
 	nxtDisplayString(2, "front bumper");
-	while(!SensorValue(bumpFront)){ wait1Msec(50); }
+	ClearTimer(T1);
+	while(!SensorValue(bumpFront)){
+		wait1Msec(50);
+		if(time100[T1] > WAIT_TIME) failState("Frontbumper error");
+	}
 	PlaySound(soundBeepBeep);
 
 	eraseDisplay();
 	nxtDisplayString(1, "Push the");
 	nxtDisplayString(2, "back bumper");
-	while(!SensorValue(bumpBack))wait1Msec(50);
+	ClearTimer(T1);
+	while(!SensorValue(bumpBack)){
+		wait1Msec(50);
+		if(time100[T1] > WAIT_TIME) failState("Backbumper error");
+	}
 	PlaySound(soundBeepBeep);
 
 	eraseDisplay();
 	nxtDisplayString(1, "Place hand in");
 	nxtDisplayString(2, "front of sonar");
-	while(SensorValue(sonarSensor)>SONAR_DISTANCE)wait1Msec(50);
+	ClearTimer(T1);
+	while(SensorValue(sonarSensor)>SONAR_DISTANCE){
+		wait1Msec(50);
+		if(time100[T1] > WAIT_TIME) failState("Sonar error");
+	}
 	PlaySound(soundBeepBeep);
 
 	eraseDisplay();
@@ -131,7 +144,7 @@ void sensorCheck(void){
 
 	eraseDisplay();
 	nxtDisplayString(1, "Starting shortly...");
-	wait1Msec(5000);
+	wait1Msec(3000);
 }
 
 
