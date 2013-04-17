@@ -3,7 +3,7 @@
 #pragma config(Sensor, S3,		 lightSensor,				sensorLightActive)
 #pragma config(Sensor, S4,		 sonarSensor,       sensorSONAR)
 
-#define DEF_SPEED 75
+#define DEF_SPEED 30
 #define SONAR_DISTANCE 30
 #define DARK_LIMIT 35
 #define LOW_BATTERY 6000
@@ -25,6 +25,7 @@ void _stop(int masterMotor){
 
 void turn(int speed, int masterMotor, int target){
 	nSyncedTurnRatio = -100;
+	nMotorEncoder[motorA] = 0;
 	nMotorEncoderTarget[motorA] = target;
 	int direction = (rand() % 10);
 	if(direction>5)
@@ -46,7 +47,7 @@ void failState(const string sensor, bool contDriving){
 		eraseDisplay();
 		nxtDisplayString(1, "%s", sensor);
 		wait1Msec(50);
-		if(sound_cnt++ > 500){
+		if(sound_cnt++ > 100){
 			sound_cnt = 0;
 			PlaySound(soundDownwardTones);
 		}
@@ -71,14 +72,21 @@ void backBumperTriggered(void){
 	else forward(DEF_SPEED,motorA);
 }
 
-void backAndTurn(int distanceToBackUp){
+void backLight(void){
 	_stop(motorA);
+	backwards(DEF_SPEED, motorA);
+	while(SensorValue(lightSensor)<DARK_LIMIT);
+	_stop(motorA);
+}
+
+void backAndTurn(int distanceToBackUp){
+	backLight();
 	bool failed = false;
 	nMotorEncoder[motorA] = 0;
 	nMotorEncoderTarget[motorA] = distanceToBackUp*180;
 	backwards(DEF_SPEED, motorA);
 	while(nMotorRunState[motorA] != runStateIdle){
-		if(SensorValue(bumpBack)){
+		if(SensorValue(bumpBack) || SensorValue(lightSensor)<DARK_LIMIT){
 			failed = true;
 			break;
 		}
