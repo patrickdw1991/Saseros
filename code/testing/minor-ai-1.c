@@ -5,7 +5,7 @@
 
 #define DEF_SPEED 30
 #define SONAR_DISTANCE 30
-#define DARK_LIMIT 35
+#define DARK_LIMIT 37
 #define LOW_BATTERY 6700
 #define WAIT_TIME 50
 
