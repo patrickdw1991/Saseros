@@ -68,18 +68,18 @@ void backAndTurn(int distanceToBackUp){
 	nMotorEncoderTarget[motorA] = distanceToBackUp*180;
 	backwards(DEF_SPEED, motorA);
 	while(nMotorRunState[motorA] != runStateIdle){
-		if(SensorValue(bumpBack) || SensorValue(lightSensor)<DARK_LIMIT){
+		if(SensorValue(bumpBack)){
 			failed = true;
 			break;
 		}
 	}
 	if(failed){
-		failState("Backbumper during backwards");
+		failState("Backed up into something");
 		failed = false;
 	} else {
 		_stop(motorA);
 		wait1Msec(1000);
-		turn_left(50,motorA,(random(500)+500));
+		turn_left(50,motorA,(random(750)+250));
 	}
 	forward(DEF_SPEED,motorA);
 }
@@ -151,16 +151,18 @@ void sensorCheck(void){
 task main()
 {
 	if (nAvgBatteryLevel < LOW_BATTERY) failState("Battery is low");
-	sensorCheck();
-	//srand(nMotorEncoder[motorA]);
+	//sensorCheck();
+	srand(nSysTime);
 	nSyncedMotors = synchAB;
 
 	forward(DEF_SPEED,motorA);
 
 	while(nNxtButtonPressed == -1){
 		eraseDisplay();
-		nxtDisplayString(1, "%d", SensorValue(bumpFront));
-		nxtDisplayString(2, "%d", SensorValue(bumpBack));
+		nxtDisplayString(1, "Front: %d", SensorValue(bumpFront));
+		nxtDisplayString(2, "Back: %d", SensorValue(bumpBack));
+		nxtDisplayString(3, "Sonar: %d", SensorValue(sonarSensor));
+		nxtDisplayString(4, "Light %d", SensorValue(lightSensor));
   	wait1Msec(50);
 
   	if(nAvgBatteryLevel < LOW_BATTERY) failState("Battery is low");
