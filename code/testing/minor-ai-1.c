@@ -23,10 +23,19 @@ void _stop(int masterMotor){
 	motor[masterMotor] = 0;
 }
 
-void turn_left(int speed, int masterMotor, int ms){
+void turn(int speed, int masterMotor, int target){
 	nSyncedTurnRatio = -100;
-	motor[masterMotor] = speed;
-	wait1Msec(ms);
+	nMotorEncoderTarget[motorA] = target;
+	int direction = (rand() % 10);
+	if(direction>5)
+		motor[masterMotor] = speed;
+	else
+		motor[masterMotor] = -speed;
+	while(nMotorRunState[motorA] != runStateIdle){
+		if(SensorValue(lightSensor)<DARK_LIMIT){
+			break;
+		}
+	}
 }
 
 void failState(const string sensor, bool contDriving){
@@ -80,7 +89,7 @@ void backAndTurn(int distanceToBackUp){
 	} else {
 		_stop(motorA);
 		wait1Msec(1000);
-		turn_left(50,motorA,(random(750)+250));
+		turn(50,motorA,((rand() % 180) + 180));
 	}
 	forward(DEF_SPEED,motorA);
 }
