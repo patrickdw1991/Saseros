@@ -19,7 +19,7 @@ void backwards(int speed, int masterMotor){
 	motor[masterMotor] = -speed;
 }
 
-void _stop(int masterMotor){\
+void _stop(int masterMotor){
 	motor[masterMotor] = 0;
 }
 
@@ -80,12 +80,12 @@ void backAndTurn(int distanceToBackUp){
 		}
 	}
 	if(failed){
-		failState("Backed up into something",1);
+		failState("Backed up into something", 0);
 		failed = false;
 	} else {
 		_stop(motorA);
 		wait1Msec(1000);
-		turn_left(50,motorA,(random(750)+250));
+		turn(50,motorA,(random(750)+250));
 	}
 	forward(DEF_SPEED,motorA);
 }
