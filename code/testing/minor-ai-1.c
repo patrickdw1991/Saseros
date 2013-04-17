@@ -75,7 +75,7 @@ void backAndTurn(int distanceToBackUp){
 		}
 	}
 	if(failed){
-		failState("Backed up into something");
+		failState("Backed up into something", 0);
 		failed = false;
 	} else {
 		_stop(motorA);
