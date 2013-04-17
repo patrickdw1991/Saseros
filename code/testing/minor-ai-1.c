@@ -1,7 +1,7 @@
-#pragma config(Sensor, S1,     bumpFront,         sensorTouch)
-#pragma config(Sensor, S2,     bumpBack,          sensorTouch)
-#pragma config(Sensor, S3,		 lightSensor,				sensorLightActive)
-#pragma config(Sensor, S4,		 sonarSensor,       sensorSONAR)
+#pragma config(Sensor, S1,    bumpFront,     sensorTouch)
+#pragma config(Sensor, S2,    bumpBack,      sensorTouch)
+#pragma config(Sensor, S3,    lightSensor,   sensorLightActive)
+#pragma config(Sensor, S4,    sonarSensor,   sensorSONAR)
 
 #define DEF_SPEED 30
 #define SONAR_DISTANCE 30
