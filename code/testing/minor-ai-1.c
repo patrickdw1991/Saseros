@@ -26,10 +26,14 @@ void _stop(int masterMotor){
 void turn(int speed, int masterMotor, int target){
 	nSyncedTurnRatio = -100;
 	nMotorEncoderTarget[motorA] = target;
-	motor[masterMotor] = speed;
+	int direction = (rand() % 10);
+	if(direction>5)
+		motor[masterMotor] = speed;
+	else
+		motor[masterMotor] = -speed;
 	while(nMotorRunState[motorA] != runStateIdle){
 		if(SensorValue(lightSensor)<DARK_LIMIT){
-
+			break;
 		}
 	}
 }
@@ -85,7 +89,7 @@ void backAndTurn(int distanceToBackUp){
 	} else {
 		_stop(motorA);
 		wait1Msec(1000);
-		turn(50,motorA,(random(750)+250));
+		turn(50,motorA,((rand() % 180) + 180));
 	}
 	forward(DEF_SPEED,motorA);
 }
@@ -173,7 +177,7 @@ task main()
 {
 	if (nAvgBatteryLevel < LOW_BATTERY) failState("Battery is low",1);
 	sensorCheck();
-	//srand(nMotorEncoder[motorA]);
+	srand(nSysTime);
 	nSyncedMotors = synchAB;
 
 	forward(DEF_SPEED,motorA);
