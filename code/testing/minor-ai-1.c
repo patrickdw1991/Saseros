@@ -19,14 +19,19 @@ void backwards(int speed, int masterMotor){
 	motor[masterMotor] = -speed;
 }
 
-void _stop(int masterMotor){
+void _stop(int masterMotor){\
 	motor[masterMotor] = 0;
 }
 
-void turn_left(int speed, int masterMotor, int ms){
+void turn(int speed, int masterMotor, int target){
 	nSyncedTurnRatio = -100;
+	nMotorEncoderTarget[motorA] = target;
 	motor[masterMotor] = speed;
-	wait1Msec(ms);
+	while(nMotorRunState[motorA] != runStateIdle){
+		if(SensorValue(lightSensor)<DARK_LIMIT){
+
+		}
+	}
 }
 
 void failState(const string sensor, bool contDriving){
@@ -75,7 +80,7 @@ void backAndTurn(int distanceToBackUp){
 		}
 	}
 	if(failed){
-		failState("Backed up into something");
+		failState("Backed up into something",1);
 		failed = false;
 	} else {
 		_stop(motorA);
