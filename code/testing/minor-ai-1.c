@@ -77,7 +77,7 @@ void backLight(void){
 	_stop(motorA);
 	backwards(DEF_SPEED, motorA);
 	while(SensorValue(lightSensor)<DARK_LIMIT){
-		//intentionally empty
+		if(SensorValue(lightSensor) == 0) failState("Light sensor disc.", 1);
 	}
 	_stop(motorA);
 }
@@ -236,6 +236,7 @@ task main()
   	if(SensorValue(bumpBack)) backBumperTriggered();
   	if(SensorValue(sonarSensor)<SONAR_DISTANCE) sonarTriggered();
   	if(SensorValue(lightSensor)<DARK_LIMIT) lightSensorTriggered();
+  	else if(SensorValue(lightSensor) == 0) failState("Light sensor disc.", 1);
   	alive();
 	}
 }
