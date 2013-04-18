@@ -25,14 +25,14 @@ void _stop(int masterMotor){
 
 void turn(int speed, int masterMotor, int target){
 	nSyncedTurnRatio = -100;
-	motor[masterMotor] = DEF_SPEED/2;
+	//motor[masterMotor] = DEF_SPEED/8;
 	nMotorEncoder[masterMotor] = 0;
 	nMotorEncoderTarget[masterMotor] = target;
 	int direction = (rand() % 10);
 	if(direction>5)
-		motor[masterMotor] = speed;
+		motor[masterMotor] = speed/4;
 	else
-		motor[masterMotor] = -speed;
+		motor[masterMotor] = -speed/4;
 	while(nMotorRunState[masterMotor] != runStateIdle){
 		if(SensorValue(lightSensor)<DARK_LIMIT){
 			break;
