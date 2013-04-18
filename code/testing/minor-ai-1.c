@@ -5,7 +5,7 @@
 
 #define DEF_SPEED 30
 #define SONAR_DISTANCE 30
-#define DARK_LIMIT 37
+#define DARK_LIMIT 43
 #define LOW_BATTERY 6700
 #define WAIT_TIME 50
 
@@ -25,14 +25,15 @@ void _stop(int masterMotor){
 
 void turn(int speed, int masterMotor, int target){
 	nSyncedTurnRatio = -100;
-	nMotorEncoder[motorA] = 0;
-	nMotorEncoderTarget[motorA] = target;
+	motor[masterMotor] = DEF_SPEED/2;
+	nMotorEncoder[masterMotor] = 0;
+	nMotorEncoderTarget[masterMotor] = target;
 	int direction = (rand() % 10);
 	if(direction>5)
 		motor[masterMotor] = speed;
 	else
 		motor[masterMotor] = -speed;
-	while(nMotorRunState[motorA] != runStateIdle){
+	while(nMotorRunState[masterMotor] != runStateIdle){
 		if(SensorValue(lightSensor)<DARK_LIMIT){
 			break;
 		}
@@ -75,7 +76,9 @@ void backBumperTriggered(void){
 void backLight(void){
 	_stop(motorA);
 	backwards(DEF_SPEED, motorA);
-	while(SensorValue(lightSensor)<DARK_LIMIT);
+	while(SensorValue(lightSensor)<DARK_LIMIT){
+		//intentionally empty
+	}
 	_stop(motorA);
 }
 
@@ -91,13 +94,13 @@ void backAndTurn(int distanceToBackUp){
 			break;
 		}
 	}
-	if(failed){
+	if (failed) {
 		failState("Backed up into something", 0);
 		failed = false;
 	} else {
 		_stop(motorA);
 		wait1Msec(1000);
-		turn(50,motorA,((rand() % 180) + 180));
+		turn(50,motorA,(random(180) + 180));
 	}
 	forward(DEF_SPEED,motorA);
 }
@@ -117,7 +120,7 @@ void lightSensorTriggered(void) {
 	PlaySound(soundBlip);
 	_stop(motorA);
 	wait1Msec(1000);
-	backAndTurn(2);
+	backAndTurn(4);
 }
 
 void sensorCheck(void){
@@ -233,5 +236,6 @@ task main()
   	if(SensorValue(bumpBack)) backBumperTriggered();
   	if(SensorValue(sonarSensor)<SONAR_DISTANCE) sonarTriggered();
   	if(SensorValue(lightSensor)<DARK_LIMIT) lightSensorTriggered();
+  	alive();
 	}
 }
